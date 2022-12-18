@@ -1,7 +1,5 @@
 import compile from "./compile.js"
 import { getConfig } from "./config.js"
-import { promiseImpl } from "./polyfills.js"
-import EtaErr from "./err.js"
 
 /* TYPES */
 
@@ -70,20 +68,13 @@ export default function render(
         return cb(err as Error)
       }
     } else {
-      // No callback, try returning a promise
-      if (typeof promiseImpl === "function") {
-        return new promiseImpl(function (resolve: Function, reject: Function) {
-          try {
-            resolve(handleCache(template, options)(data, options))
-          } catch (err) {
-            reject(err)
-          }
-        })
-      } else {
-        throw EtaErr(
-          "Please provide a callback function, this env doesn't support Promises"
-        )
-      }
+      return new Promise(function (resolve: Function, reject: Function) {
+        try {
+          resolve(handleCache(template, options)(data, options))
+        } catch (err) {
+          reject(err)
+        }
+      })
     }
   } else {
     return handleCache(template, options)(data, options)

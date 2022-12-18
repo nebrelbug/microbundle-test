@@ -12,7 +12,7 @@
       "types": "./dist/types/eta.d.ts",
       "browser": "./dist/browser.min.umd.js",
       "require": "./dist/eta.umd.js",
-      "import": "./dist/eta.modern.js",
+      "import": "./dist/eta.module.js",
       "default": "./dist/eta.umd.js"
     },
     "./browser.js": {
@@ -22,7 +22,7 @@
   },
   "scripts": {
     "build": "rm -rf dist && npm run build:node && npm run build:browser",
-    "build:node": "microbundle lib/node.ts --target node --format modern,esm,umd",
+    "build:node": "microbundle lib/node.ts --target node --format esm,umd",
     "build:browser": "microbundle lib/browser.ts --target web --format umd --output dist/browser.min.js",
     "dev": "microbundle watch",
     "tsc": "tsc"

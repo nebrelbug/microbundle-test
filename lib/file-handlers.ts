@@ -5,7 +5,6 @@ import compile from "./compile.js"
 import { getConfig } from "./config.js"
 import { getPath, readFile } from "./file-utils.js"
 import { copyProps } from "./utils.js"
-import { promiseImpl } from "./polyfills.js"
 
 /* TYPES */
 
@@ -115,25 +114,15 @@ function tryHandleCache(
       return cb(err as Error)
     }
   } else {
-    // No callback, try returning a promise
-    if (typeof promiseImpl === "function") {
-      return new promiseImpl<string>(function (
-        resolve: Function,
-        reject: Function
-      ) {
-        try {
-          const templateFn = handleCache(options)
-          const result = templateFn(data, options)
-          resolve(result)
-        } catch (err) {
-          reject(err)
-        }
-      })
-    } else {
-      throw EtaErr(
-        "Please provide a callback function, this env doesn't support Promises"
-      )
-    }
+    return new Promise<string>(function (resolve: Function, reject: Function) {
+      try {
+        const templateFn = handleCache(options)
+        const result = templateFn(data, options)
+        resolve(result)
+      } catch (err) {
+        reject(err)
+      }
+    })
   }
 }
 

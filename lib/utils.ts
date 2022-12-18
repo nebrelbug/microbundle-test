@@ -1,7 +1,4 @@
 // TODO: allow '-' to trim up until newline. Use [^\S\n\r] instead of \s
-// TODO: only include trimLeft polyfill if not in ES6
-
-import { trimLeft, trimRight } from "./polyfills.js"
 
 /* TYPES */
 
@@ -73,7 +70,7 @@ function trimWS(
     // console.log('trimming left' + leftTrim)
     // full slurp
 
-    str = trimLeft(str)
+    str = str.trimStart()
   } else if (leftTrim === "-" || leftTrim === "nl") {
     // nl trim
     str = str.replace(/^(?:\r\n|\n|\r)/, "")
@@ -81,7 +78,7 @@ function trimWS(
 
   if (rightTrim === "_" || rightTrim === "slurp") {
     // full slurp
-    str = trimRight(str)
+    str = str.trimEnd()
   } else if (rightTrim === "-" || rightTrim === "nl") {
     // nl trim
     str = str.replace(/(?:\r\n|\n|\r)$/, "") // TODO: make sure this gets \r\n

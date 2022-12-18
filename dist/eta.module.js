@@ -44,17 +44,6 @@ function ParseErr(message, str, indx) {
   throw EtaErr(message);
 }
 
-const promiseImpl = Promise;
-function getAsyncFunctionConstructor() {
-  return async function () {}.constructor;
-}
-function trimLeft(str) {
-  return str.trimStart();
-}
-function trimRight(str) {
-  return str.trimEnd();
-}
-
 // TODO: allow '-' to trim up until newline. Use [^\S\n\r] instead of \s
 /* END TYPES */
 function hasOwnProp(obj, prop) {
@@ -97,14 +86,14 @@ function trimWS(str, config, wsLeft, wsRight) {
   if (leftTrim === "_" || leftTrim === "slurp") {
     // console.log('trimming left' + leftTrim)
     // full slurp
-    str = trimLeft(str);
+    str = str.trimStart();
   } else if (leftTrim === "-" || leftTrim === "nl") {
     // nl trim
     str = str.replace(/^(?:\r\n|\n|\r)/, "");
   }
   if (rightTrim === "_" || rightTrim === "slurp") {
     // full slurp
-    str = trimRight(str);
+    str = str.trimEnd();
   } else if (rightTrim === "-" || rightTrim === "nl") {
     // nl trim
     str = str.replace(/(?:\r\n|\n|\r)$/, ""); // TODO: make sure this gets \r\n
@@ -456,6 +445,10 @@ function configure(options) {
   return copyProps(config, options);
 }
 
+function getAsyncFunctionConstructor() {
+  return async function () {}.constructor;
+}
+
 /* END TYPES */
 /**
  * Takes a template string and returns a template function that can be called with (data, config, [cb])
@@ -701,20 +694,15 @@ function tryHandleCache(data, options, cb) {
       return cb(err);
     }
   } else {
-    // No callback, try returning a promise
-    if (typeof promiseImpl === "function") {
-      return new promiseImpl(function (resolve, reject) {
-        try {
-          const templateFn = handleCache$1(options);
-          const result = templateFn(data, options);
-          resolve(result);
-        } catch (err) {
-          reject(err);
-        }
-      });
-    } else {
-      throw EtaErr("Please provide a callback function, this env doesn't support Promises");
-    }
+    return new Promise(function (resolve, reject) {
+      try {
+        const templateFn = handleCache$1(options);
+        const result = templateFn(data, options);
+        resolve(result);
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
 }
 /**
@@ -855,18 +843,13 @@ function render(template, data, config, cb) {
         return cb(err);
       }
     } else {
-      // No callback, try returning a promise
-      if (typeof promiseImpl === "function") {
-        return new promiseImpl(function (resolve, reject) {
-          try {
-            resolve(handleCache(template, options)(data, options));
-          } catch (err) {
-            reject(err);
-          }
-        });
-      } else {
-        throw EtaErr("Please provide a callback function, this env doesn't support Promises");
-      }
+      return new Promise(function (resolve, reject) {
+        try {
+          resolve(handleCache(template, options)(data, options));
+        } catch (err) {
+          reject(err);
+        }
+      });
     }
   } else {
     return handleCache(template, options)(data, options);

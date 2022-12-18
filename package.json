@@ -1,0 +1,34 @@
+{
+  "name": "eta",
+  "type": "module",
+  "main": "./dist/eta.umd.js",
+  "module": "./dist/eta.module.js",
+  "umd:main": "./dist/eta.umd.js",
+  "unpkg": "./dist/browser.min.umd.js",
+  "types": "./dist/types/eta.d.ts",
+  "source": "lib/node.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/eta.d.ts",
+      "browser": "./dist/browser.min.umd.js",
+      "require": "./dist/eta.umd.js",
+      "import": "./dist/eta.modern.js",
+      "default": "./dist/eta.umd.js"
+    },
+    "./browser.js": {
+      "types": "./dist/types/browser.d.ts",
+      "default": "./dist/"
+    }
+  },
+  "scripts": {
+    "build": "rm -rf dist && npm run build:node && npm run build:browser",
+    "build:node": "microbundle lib/node.ts --target node --format modern,esm,umd",
+    "build:browser": "microbundle lib/browser.ts --target web --format umd --output dist/browser.min.js",
+    "dev": "microbundle watch",
+    "tsc": "tsc"
+  },
+  "devDependencies": {
+    "microbundle": "^0.15.1",
+    "typescript": "^4.9.4"
+  }
+}
